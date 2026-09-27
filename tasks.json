@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "title": "learn js",
+        "priority": "high",
+        "completed": true
+    },
+    {
+        "id": 2,
+        "title": "github repo",
+        "priority": "medium",
+        "completed": false
+    },
+    {
+        "id": 3,
+        "title": "install nodejs",
+        "priority": "medium",
+        "completed": false
+    }
+]
