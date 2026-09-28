@@ -3,14 +3,14 @@ const myButton = document.querySelector("#load-btn");
 
 myButton.addEventListener("click", async () => {
     try{
-        const user_data = await fetch("https://jsonplaceholder.typicode.com/users");
+        const response = await fetch("http://127.0.0.1:8000/api/tasks");
 
-        const users = await user_data.json();
+        const tasks = await response.json();
 
-        const html_cards = users.map(user => 
+        const html_cards = tasks.map(task => 
             `<div class="card">
-                <h3>${user.name}</h3>
-                <p>${user.email}</p>
+                <h3>${task.title}</h3>
+                <p>Priority: ${task.priority}</p>
             </div>`);
         container.innerHTML = html_cards.join("");
     } catch(error) {
