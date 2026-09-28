@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>User Directory</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+    .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .card h3 { margin: 0 0 8px 0; font-size: 18px; color: #333; }
+    .card p { margin: 0; color: #666; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <h1>Список пользователей</h1>
+  <button id="load-btn">Загрузить пользователей</button>
+  <div id="user-container" class="card-grid"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
