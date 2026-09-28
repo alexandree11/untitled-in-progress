@@ -7,7 +7,7 @@ const students = [
 ];
 
 const students_passed = students
-    .filter(student => students.score >= 80)
+    .filter(students => students.score >= 80)
     .map(students => students.name.toUpperCase());
 
 console.log(students_passed);
