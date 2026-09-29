@@ -1,20 +1,14 @@
 const container = document.querySelector("#user-container");
-const myButton = document.querySelector("#load-btn");
+const loadButton = document.querySelector("#load-btn");
 const addButton = document.querySelector("[id='add-btn']");
 const taskInput = document.querySelector("#task-title");
+const priorityInput = document.querySelector("#task-priority");
+let currentFilter = "all";
+const filterButtonsContainer = document.querySelector("#filter-buttons");
 
-myButton.addEventListener("click", async () => {
+loadButton.addEventListener("click", async () => {
     try{
-        const response = await fetch("http://127.0.0.1:8000/api/tasks");
-
-        const tasks = await response.json();
-
-        const html_cards = tasks.map(task => 
-            `<div class="card">
-                <h3>${task.title}</h3>
-                <p>Priority: ${task.priority}</p>
-            </div>`);
-        container.innerHTML = html_cards.join("");
+        loadTasks()
     } catch(error) {
         console.log("Error:", error);
     }
@@ -22,6 +16,7 @@ myButton.addEventListener("click", async () => {
 
 addButton.addEventListener("click", async() => {
     const titleInputValue = taskInput.value.trim();
+    const priorityInputValue = priorityInput.value;
     if (!titleInputValue) return;
     try{
         await fetch("http://127.0.0.1:8000/api/tasks", {
@@ -31,13 +26,72 @@ addButton.addEventListener("click", async() => {
             },
             body: JSON.stringify({
                 title: titleInputValue,
-                priority: "medium"
+                priority: priorityInputValue
             })
         });
 
         taskInput.value = "";
-        myButton.click();
+        loadTasks();
     } catch(error) {
         console.log('Error: ', error);
+    }
+});
+
+// DELETE Request
+async function deleteTask(taskId) {
+    await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
+        method: "DELETE"
+    });
+    loadTasks();
+}
+
+// PATCH Request
+async function toggleTaskComplete(taskId) {
+    await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}/complete`, {
+        method: "PATCH"
+    });
+    loadTasks();
+}
+
+container.addEventListener("click", (e) => {
+    const taskId = e.target.dataset.id;
+    if (!taskId) return;
+
+    if (e.target.classList.contains("delete-btn")) {
+        deleteTask(taskId);
+    } else if (e.target.classList.contains("complete-checkbox")) {
+        toggleTaskComplete(taskId);
+    }
+});
+
+async function loadTasks(){
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/tasks");
+        const tasks = await response.json();
+
+        let filteredTasks = tasks;
+        if(currentFilter === "active") {
+            filteredTasks = tasks.filter(task => !task.is_completed);
+        } else if(currentFilter === "completed") {
+            filteredTasks = tasks.filter(task => task.is_completed);
+        }
+
+        const html_cards = filteredTasks.map(task => 
+            `<div class="card ${task.is_completed ? "completed" : ""}">
+                <h3 class="${task.is_completed ? "completed" : ""}">${task.title}</h3>
+                <p>Priority: <span class="priority-${task.priority}">${task.priority}</span></p>
+                <input type="checkbox" class="complete-checkbox" data-id="${task.id}" ${task.is_completed ? "checked" : ""}>
+                <button class="delete-btn" data-id="${task.id}">Delete</button>
+            </div>`);
+        container.innerHTML = html_cards.join("");
+    } catch(error) {
+        console.log("Error:", error);
+}}
+document.addEventListener("DOMContentLoaded", loadTasks);
+
+filterButtonsContainer.addEventListener("click", (e) => {
+    if (e.target.classList.contains("filter-btn")) {
+        currentFilter = e.target.dataset.filter;
+        loadTasks();
     }
 });
