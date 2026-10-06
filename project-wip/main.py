@@ -5,6 +5,7 @@ import sqlite3
 class TaskCreate(BaseModel):
     title: str
     priority: str = 'medium'
+    description: str = ''
 
 app = FastAPI()
 
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS tasks(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     priority TEXT DEFAULT 'medium',
+    description TEXT DEFAULT '',
     is_completed BOOLEAN DEFAULT 0)""")
 
 init_db()
@@ -35,8 +37,8 @@ def get_tasks():
 def create_task(task: TaskCreate):
     connect = get_db_connection()
     cursor = connect.cursor()
-    cursor.execute("INSERT INTO tasks (title, priority) VALUES (?, ?)",
-                   (task.title, task.priority))
+    cursor.execute("INSERT INTO tasks (title, priority, description) VALUES (?, ?, ?)",
+                   (task.title, task.priority, task.description))
     connect.commit()
     connect.close()
     return {"message": "Task created successfully."}
