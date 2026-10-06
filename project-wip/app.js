@@ -1,39 +1,34 @@
 const container = document.querySelector("#user-container");
-const loadButton = document.querySelector("#load-btn");
-const addButton = document.querySelector("[id='add-btn']");
+const addButton = document.querySelector("#add-btn");
 const taskInput = document.querySelector("#task-title");
+const descInput = document.querySelector("#task-desc");
 const priorityInput = document.querySelector("#task-priority");
-let currentFilter = "all";
+const searchInput = document.querySelector("#search-input");
 const filterButtonsContainer = document.querySelector("#filter-buttons");
 
-loadButton.addEventListener("click", async () => {
-    try{
-        loadTasks()
-    } catch(error) {
-        console.log("Error:", error);
-    }
-})
+const API = "http://127.0.0.1:8000/api/tasks";
 
-addButton.addEventListener("click", async() => {
-    const titleInputValue = taskInput.value.trim();
-    const priorityInputValue = priorityInput.value;
-    if (!titleInputValue) return;
-    try{
-        await fetch("http://127.0.0.1:8000/api/tasks", {
+let allTasks = [];
+let currentFilter = "all";
+let searchQuery = "";
+
+addButton.addEventListener("click", async () => {
+    const title = taskInput.value.trim();
+    const description = descInput.value.trim();
+    const priority = priorityInput.value;
+    if (!title) return;
+
+    try {
+        await fetch(API, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                title: titleInputValue,
-                priority: priorityInputValue
-            })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title, description, priority })
         });
-
         taskInput.value = "";
+        descInput.value = "";
         loadTasks();
-    } catch(error) {
-        console.log('Error: ', error);
+    } catch (error) {
+        console.log("Error:", error);
     }
 });
 
@@ -64,30 +59,63 @@ container.addEventListener("click", (e) => {
     }
 });
 
-async function loadTasks(){
+async function loadTasks() {
     try {
-        const response = await fetch("http://127.0.0.1:8000/api/tasks");
-        const tasks = await response.json();
-
-        let filteredTasks = tasks;
-        if(currentFilter === "active") {
-            filteredTasks = tasks.filter(task => !task.is_completed);
-        } else if(currentFilter === "completed") {
-            filteredTasks = tasks.filter(task => task.is_completed);
-        }
-
-        const html_cards = filteredTasks.map(task => 
-            `<div class="card ${task.is_completed ? "completed" : ""}">
-                <h3 class="${task.is_completed ? "completed" : ""}">${task.title}</h3>
-                <p>Priority: <span class="priority-${task.priority}">${task.priority}</span></p>
-                <input type="checkbox" class="complete-checkbox" data-id="${task.id}" ${task.is_completed ? "checked" : ""}>
-                <button class="delete-btn" data-id="${task.id}">Delete</button>
-            </div>`);
-        container.innerHTML = html_cards.join("");
-    } catch(error) {
+        const response = await fetch(API);
+        allTasks = await response.json();
+        renderTasks();
+    } catch (error) {
         console.log("Error:", error);
-}}
-document.addEventListener("DOMContentLoaded", loadTasks);
+    }
+}
+
+function getVisibleTasks() {
+    const q = searchQuery.trim().toLowerCase();
+
+    return allTasks.filter(task => {
+        const matchesStatus =
+            currentFilter === "all" ||
+            (currentFilter === "active" && !task.is_completed) ||
+            (currentFilter === "completed" && task.is_completed);
+
+        const matchesSearch =
+            !q ||
+            task.title.toLowerCase().includes(q) ||
+            (task.description || "").toLowerCase().includes(q);
+
+        return matchesStatus && matchesSearch;
+    });
+}
+
+function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function renderTasks() {
+    const tasks = getVisibleTasks();
+
+    if (tasks.length === 0) {
+        container.innerHTML = `<p class="empty">No tasks found</p>`;
+        return;
+    }
+
+    container.innerHTML = tasks.map(task => `
+        <div class="task-item ${task.is_completed ? "completed" : ""}">
+            <input type="checkbox" class="complete-checkbox" data-id="${task.id}"
+                   ${task.is_completed ? "checked" : ""}>
+            <div class="task-info">
+                <h3 class="task-title">${escapeHTML(task.title)}</h3>
+                ${task.description
+                    ? `<p class="task-desc">${escapeHTML(task.description)}</p>`
+                    : ""}
+            </div>
+            <span class="priority-${task.priority}">${task.priority}</span>
+            <button class="delete-btn" data-id="${task.id}">Delete</button>
+        </div>
+    `).join("");
+}
 
 filterButtonsContainer.addEventListener("click", (e) => {
     if (e.target.classList.contains("filter-btn")) {
@@ -95,3 +123,6 @@ filterButtonsContainer.addEventListener("click", (e) => {
         loadTasks();
     }
 });
+
+
+document.addEventListener("DOMContentLoaded", loadTasks);

@@ -10,18 +10,73 @@ button {
     cursor: pointer;
 }
 
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+.add-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.add-form input,
+.add-form select,
+#search-input {
+    padding: 10px;
+    font-size: 16px;
+}
+
+#search-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.task-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-top: 20px;
 }
 
-.card {
-    padding: 15px;
+.task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 16px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     background: #cbc2ff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.task-item.completed {
+    background-color: #a6ffb2;
+}
+
+.task-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-title {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.task-desc {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.complete-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.empty {
+    text-align: center;
+    color: #999;
 }
 
 .card h3 {
@@ -58,4 +113,9 @@ button {
 .priority-low {
     color: green;
     font-weight: bold;
+}
+
+.task-item.completed .task-title,
+.task-item.completed .task-desc {
+    text-decoration: line-through;
 }

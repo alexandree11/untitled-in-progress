@@ -15,15 +15,19 @@
   </div>
   
   <h1>Tasks list</h1>
+<div class="add-form">
   <input type="text" id="task-title" placeholder="Task name">
+  <input type="text" id="task-desc" placeholder="Description (optional)">
   <select id="task-priority">
     <option value="low">Low</option>
     <option value="medium" selected>Medium</option>
     <option value="high">High</option>
   </select>
   <button id="add-btn">Add</button>
-  <button id="load-btn">Show tasks</button>
-  <div id="user-container" class="card-grid"></div>
+</div>
+<input type="search" id="search-input" placeholder="Search tasks...">
+
+<div id="user-container" class="task-container"></div>
 
   <script src="app.js"></script>
 </body>
