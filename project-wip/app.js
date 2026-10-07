@@ -28,12 +28,12 @@ function closeModal() {
 openModalBtn.addEventListener("click", openModal);
 closeModalBtn.addEventListener("click", closeModal);
 
-// закрытие по клику на затемнённый фон (но не на само окно)
+// close on background click
 modalOverlay.addEventListener("click", (e) => {
     if (e.target === modalOverlay) closeModal();
 });
 
-// закрытие по Escape
+// close on Esc
 document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeModal();
 });
@@ -56,7 +56,7 @@ addButton.addEventListener("click", async () => {
         });
 
         if (!response.ok) {
-            console.log("Ответ сервера:", await response.text());
+            console.log("Server response:", await response.text());
             return;
         }
 
