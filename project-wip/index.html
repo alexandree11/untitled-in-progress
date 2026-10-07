@@ -13,21 +13,34 @@
     <button class="filter-btn" data-filter="active">Active</button>
     <button class="filter-btn" data-filter="completed">Completed</button>
   </div>
-  
-  <h1>Tasks list</h1>
-<div class="add-form">
-  <input type="text" id="task-title" placeholder="Task name">
-  <input type="text" id="task-desc" placeholder="Description (optional)">
-  <select id="task-priority">
-    <option value="low">Low</option>
-    <option value="medium" selected>Medium</option>
-    <option value="high">High</option>
-  </select>
-  <button id="add-btn">Add</button>
-</div>
-<input type="search" id="search-input" placeholder="Search tasks...">
 
-<div id="user-container" class="task-container"></div>
+  <h1>Tasks list</h1>
+  <button id="open-modal-btn">+ New task</button>
+
+  <input type="search" id="search-input" placeholder="Search tasks...">
+
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <button id="close-modal-btn" class="modal-close">×</button>
+      <h2>New task</h2>
+
+      <input type="text" id="task-title" placeholder="Task name">
+      <input type="text" id="task-desc" placeholder="Description (optional)">
+      <select id="task-priority">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+      <label>
+        Deadline
+        <input type="datetime-local" id="task-deadline">
+      </label>
+
+      <button id="add-btn">Add</button>
+    </div>
+  </div>
+
+  <div id="user-container" class="task-container"></div>
 
   <script src="app.js"></script>
 </body>

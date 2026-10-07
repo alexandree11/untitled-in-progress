@@ -5,6 +5,10 @@ const descInput = document.querySelector("#task-desc");
 const priorityInput = document.querySelector("#task-priority");
 const searchInput = document.querySelector("#search-input");
 const filterButtonsContainer = document.querySelector("#filter-buttons");
+const openModalBtn = document.querySelector("#open-modal-btn");
+const closeModalBtn = document.querySelector("#close-modal-btn");
+const modalOverlay = document.querySelector("#modal-overlay");
+const deadlineInput = document.querySelector("#task-deadline");
 
 const API = "http://127.0.0.1:8000/api/tasks";
 
@@ -12,21 +16,55 @@ let allTasks = [];
 let currentFilter = "all";
 let searchQuery = "";
 
+function openModal() {
+    modalOverlay.classList.remove("hidden");
+    taskInput.focus();
+}
+
+function closeModal() {
+    modalOverlay.classList.add("hidden");
+}
+
+openModalBtn.addEventListener("click", openModal);
+closeModalBtn.addEventListener("click", closeModal);
+
+// закрытие по клику на затемнённый фон (но не на само окно)
+modalOverlay.addEventListener("click", (e) => {
+    if (e.target === modalOverlay) closeModal();
+});
+
+// закрытие по Escape
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+});
+
 addButton.addEventListener("click", async () => {
     const title = taskInput.value.trim();
     const description = descInput.value.trim();
     const priority = priorityInput.value;
+    const deadline = deadlineInput.value
+        ? new Date(deadlineInput.value).toISOString()
+        : null;
+
     if (!title) return;
 
     try {
-        await fetch(API, {
+        const response = await fetch(API, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title, description, priority })
+            body: JSON.stringify({ title, description, priority, deadline })
         });
+
+        if (!response.ok) {
+            console.log("Ответ сервера:", await response.text());
+            return;
+        }
+
         taskInput.value = "";
         descInput.value = "";
-        loadTasks();
+        deadlineInput.value = "";
+        closeModal();
+        await loadTasks();
     } catch (error) {
         console.log("Error:", error);
     }

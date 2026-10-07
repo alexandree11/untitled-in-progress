@@ -119,3 +119,59 @@ button {
 .task-item.completed .task-desc {
     text-decoration: line-through;
 }
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal h2 {
+    margin: 0;
+}
+
+.modal input,
+.modal select {
+    padding: 10px;
+    font-size: 16px;
+}
+
+.modal label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+    color: #555;
+}
+
+.modal-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 10px;
+    font-size: 22px;
+    line-height: 1;
+    border: none;
+    background: transparent;
+}
+
+.hidden {
+    display: none;
+}
