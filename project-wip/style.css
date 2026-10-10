@@ -91,13 +91,13 @@ button {
     font-size: 14px;
 }
 
-.completed {
+.completed .task.task-item.completed{
     text-decoration: line-through;
-    opacity: 0.6;
 }
 
 .card.completed {
     background-color: #a6ffb2;
+    opacity: .6;
 }
 
 .priority-high {

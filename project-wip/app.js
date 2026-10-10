@@ -16,6 +16,19 @@ let allTasks = [];
 let currentFilter = "all";
 let searchQuery = "";
 
+container.addEventListener("click", (e) => {
+    const target = e.target.closest("[data-id]");
+    if (!target) return
+    const taskId = target.dataset.id;
+
+    if (target.classList.contains("delete-btn")) {
+        deleteTask(taskId);
+    } else if ((target.classList.contains("complete-checkbox")) 
+        || (target.classList.contains("return-btn"))) {
+        toggleTaskComplete(taskId);
+    }
+});
+
 function openModal() {
     modalOverlay.classList.remove("hidden");
     taskInput.focus();
@@ -72,10 +85,14 @@ addButton.addEventListener("click", async () => {
 
 // DELETE Request
 async function deleteTask(taskId) {
-    await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
-        method: "DELETE"
-    });
-    loadTasks();
+    const confirmDelete = confirm("Do you want to delete this task?");
+
+    if(confirmDelete){
+        await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
+            method: "DELETE"
+        });
+        loadTasks();
+    }
 }
 
 // PATCH Request
@@ -85,17 +102,6 @@ async function toggleTaskComplete(taskId) {
     });
     loadTasks();
 }
-
-container.addEventListener("click", (e) => {
-    const taskId = e.target.dataset.id;
-    if (!taskId) return;
-
-    if (e.target.classList.contains("delete-btn")) {
-        deleteTask(taskId);
-    } else if (e.target.classList.contains("complete-checkbox")) {
-        toggleTaskComplete(taskId);
-    }
-});
 
 async function loadTasks() {
     try {
@@ -142,7 +148,7 @@ function renderTasks() {
     container.innerHTML = tasks.map(task => `
         <div class="task-item ${task.is_completed ? "completed" : ""}">
             <input type="checkbox" class="complete-checkbox" data-id="${task.id}"
-                   ${task.is_completed ? "checked" : ""}>
+                ${task.is_completed ? "checked" : ""}>
             <div class="task-info">
                 <h3 class="task-title">${escapeHTML(task.title)}</h3>
                 ${task.description
@@ -150,7 +156,9 @@ function renderTasks() {
                     : ""}
             </div>
             <span class="priority-${task.priority}">${task.priority}</span>
-            <button class="delete-btn" data-id="${task.id}">Delete</button>
+            ${task.is_completed ? 
+                `<button class="return-btn" data-id="${task.id}">Return</button>` : ""}
+            <button class="delete-btn" data-id="${task.id}"><span>Delete</span></button>
         </div>
     `).join("");
 }
