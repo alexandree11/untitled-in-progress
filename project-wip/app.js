@@ -23,9 +23,12 @@ container.addEventListener("click", (e) => {
 
     if (target.classList.contains("delete-btn")) {
         deleteTask(taskId);
-    } else if ((target.classList.contains("complete-checkbox")) 
+    } else if ((target.classList.contains("complete-checkbox"))
         || (target.classList.contains("return-btn"))) {
         toggleTaskComplete(taskId);
+    } else if ((target.classList.contains("pin-btn"))
+        || (target.classList.contains("unpin-btn"))) {
+        toggleTaskPin(taskId);
     }
 });
 
@@ -87,7 +90,7 @@ addButton.addEventListener("click", async () => {
 async function deleteTask(taskId) {
     const confirmDelete = confirm("Do you want to delete this task?");
 
-    if(confirmDelete){
+    if (confirmDelete) {
         await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
             method: "DELETE"
         });
@@ -98,6 +101,13 @@ async function deleteTask(taskId) {
 // PATCH Request
 async function toggleTaskComplete(taskId) {
     await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}/complete`, {
+        method: "PATCH"
+    });
+    loadTasks();
+}
+
+async function toggleTaskPin(taskId) {
+    await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}/pin`, {
         method: "PATCH"
     });
     loadTasks();
@@ -116,19 +126,27 @@ async function loadTasks() {
 function getVisibleTasks() {
     const q = searchQuery.trim().toLowerCase();
 
-    return allTasks.filter(task => {
-        const matchesStatus =
-            currentFilter === "all" ||
-            (currentFilter === "active" && !task.is_completed) ||
-            (currentFilter === "completed" && task.is_completed);
+    return allTasks
+        .filter(task => {
+            const matchesStatus =
+                currentFilter === "all"
+                || (currentFilter === "active" && !task.is_completed)
+                || (currentFilter === "completed" && task.is_completed);
 
-        const matchesSearch =
-            !q ||
-            task.title.toLowerCase().includes(q) ||
-            (task.description || "").toLowerCase().includes(q);
+            const matchesSearch =
+                !q ||
+                task.title.toLowerCase().includes(q) ||
+                (task.description || "").toLowerCase().includes(q);
 
-        return matchesStatus && matchesSearch;
-    });
+            return matchesStatus && matchesSearch;
+        })
+
+        .sort((a, b) => {
+            if (b.is_pinned !== a.is_pinned){
+                return b.is_pinned - a.is_pinned;
+            }
+            return ((b.pinned_at || "").localeCompare((a.pinned_at || "")));
+        });
 }
 
 function escapeHTML(str) {
@@ -152,12 +170,15 @@ function renderTasks() {
             <div class="task-info">
                 <h3 class="task-title">${escapeHTML(task.title)}</h3>
                 ${task.description
-                    ? `<p class="task-desc">${escapeHTML(task.description)}</p>`
-                    : ""}
+            ? `<p class="task-desc">${escapeHTML(task.description)}</p>`
+            : ""}
             </div>
             <span class="priority-${task.priority}">${task.priority}</span>
-            ${task.is_completed ? 
-                `<button class="return-btn" data-id="${task.id}">Return</button>` : ""}
+            ${task.is_completed ?
+            `<button class="return-btn" data-id="${task.id}"><span>Return</span></button>` : ""}
+            ${task.is_pinned ? `<button class="unpin-btn" data-id=${task.id}><span>Unpin</span></button>`
+            : `<button class="pin-btn" data-id="${task.id}"><span>Pin</span></button>`}
+            
             <button class="delete-btn" data-id="${task.id}"><span>Delete</span></button>
         </div>
     `).join("");
