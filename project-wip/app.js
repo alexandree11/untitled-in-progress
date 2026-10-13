@@ -234,7 +234,7 @@ function addedTime(dateCreated) {
     const creationDate = new Date(dateCreated);
     const timeDiff = Date.now() - creationDate;
 
-    if(timeDiff <= 5000) { return "just now"; }
+    if(timeDiff <= 5000) { return "just now"; }         // THINK ABOUT WHAT IF timeDiff < 0
 
     return (timeCountTexted(timeDiff) + " ago");
 }
