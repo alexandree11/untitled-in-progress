@@ -101,17 +101,17 @@ button {
 }
 
 .priority-high {
-    color: red;
+    color: rgba(255, 0, 0, 0.5);
     font-weight: bold;
 }
 
 .priority-medium {
-    color: yellow;
+    color: rgba(255, 255, 0, 0.5);
     font-weight: bold;
 }
 
 .priority-low {
-    color: green;
+    color: rgba(0, 128, 0, 0.5);
     font-weight: bold;
 }
 
@@ -175,3 +175,10 @@ button {
 .hidden {
     display: none;
 }
+
+.task-deadline {
+    color: gray;
+    font-size: 10px;
+}
+
+/* .task-deadline-missed {} */

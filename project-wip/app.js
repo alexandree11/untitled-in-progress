@@ -1,5 +1,5 @@
 const container = document.querySelector("#user-container");
-const addButton = document.querySelector("#add-btn");
+const addTaskButton = document.querySelector("#add-btn");
 const taskInput = document.querySelector("#task-title");
 const descInput = document.querySelector("#task-desc");
 const priorityInput = document.querySelector("#task-priority");
@@ -54,7 +54,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeModal();
 });
 
-addButton.addEventListener("click", async () => {
+addTaskButton.addEventListener("click", async () => {
     const title = taskInput.value.trim();
     const description = descInput.value.trim();
     const priority = priorityInput.value;
@@ -142,7 +142,7 @@ function getVisibleTasks() {
         })
 
         .sort((a, b) => {
-            if (b.is_pinned !== a.is_pinned){
+            if (b.is_pinned !== a.is_pinned) {
                 return b.is_pinned - a.is_pinned;
             }
             return ((b.pinned_at || "").localeCompare((a.pinned_at || "")));
@@ -170,14 +170,24 @@ function renderTasks() {
             <div class="task-info">
                 <h3 class="task-title">${escapeHTML(task.title)}</h3>
                 ${task.description
-            ? `<p class="task-desc">${escapeHTML(task.description)}</p>`
-            : ""}
+                    ? `<p class="task-desc">${escapeHTML(task.description)}</p>`
+                    : ""}
+                ${task.date_created
+                    ? `<p class="task-deadline">Created ${addedTime(task.date_created)}</p>`            // CHANGE CLASS STYLE FROM TASK-DEADLINE TO A NEW ONE
+                    : ""}
+                ${task.deadline && !task.is_completed 
+                    ? `<p class="task-deadline">Due in ${deadlineTimeLeft(task.deadline)}</p>`          // REWORK CLASS STYLE .TASK-DEADLINE
+                    : ""}
+                ${task.is_completed && task.date_completed
+                    ? `<p class="task-deadline">Completed in ${completionTime(task.date_created, task.date_completed)}</p>`          // CHANGE CLASS STYLE FROM TASK-DEADLINE TO A NEW ONE
+                    : ""}
             </div>
             <span class="priority-${task.priority}">${task.priority}</span>
-            ${task.is_completed ?
-            `<button class="return-btn" data-id="${task.id}"><span>Return</span></button>` : ""}
-            ${task.is_pinned ? `<button class="unpin-btn" data-id=${task.id}><span>Unpin</span></button>`
-            : `<button class="pin-btn" data-id="${task.id}"><span>Pin</span></button>`}
+            ${task.is_completed 
+                ? `<button class="return-btn" data-id="${task.id}"><span>Return</span></button>` : ""}
+            ${task.is_pinned 
+                ? `<button class="unpin-btn" data-id="${task.id}"><span>Unpin</span></button>`
+                : `<button class="pin-btn" data-id="${task.id}"><span>Pin</span></button>`}
             
             <button class="delete-btn" data-id="${task.id}"><span>Delete</span></button>
         </div>
@@ -195,30 +205,58 @@ function pluralize(count, word) {
     return `${count} ${word}${count === 1 ? "" : "s"}`;
 }
 
-function formatTimeLeft(deadline){
-    const date = new Date(deadline);
-    const dateDiff = date - Date.now();
+function deadlineTimeLeft(deadline) {
+    if (!deadline) { return ""; }
 
-    const days = Math.floor(date/86400000);
-    const restDays = date%86400000;
-    const hours = Math.floor(restDays/3600000);
-    const restHours = restDays%3600000;
-    const minutes = Math.floor(restHours/60000);
-    const restMinutes = restHours%60000;
-    const seconds = Math.floor(restMinutes/1000);
+    const deadlineDate = new Date(deadline);
+    const timeDiff = deadlineDate - Date.now();
 
-    if (!deadline) { return "";}
-    else if(dateDiff <= 0) {
-        return "Deadline was not met.";
-    }
-    else {
-        if(days > 0){ return `${pluralize(days, "day")}, ${pluralize(hours, "hour")}`; }
-        else if (hours > 0){ return `${pluralize(hours, "hour")}, ${pluralize(minutes, "minute")}`; }
-        else if (minutes > 0){ return `${pluralize(minutes, "minute")}, ${pluralize(seconds, "second")}`; }
-        else { return `${pluralize(seconds, "second")}`; }
+    if (timeDiff <= 0) {
+        return "Overdue";
     }
 
+    return timeCountTexted(timeDiff);
+}
 
+function completionTime(dateCreated, dateCompleted) {
+    if(!dateCreated || !dateCompleted) { return "";}
+
+    const creationDate = new Date(dateCreated)
+    const completionDate = new Date(dateCompleted);
+    const timeDiff = completionDate - creationDate;
+
+    return timeCountTexted(timeDiff);
+}
+
+function addedTime(dateCreated) {
+    if(!dateCreated) { return ""; }
+
+    const creationDate = new Date(dateCreated);
+    const timeDiff = Date.now() - creationDate;
+
+    if(timeDiff <= 5000) { return "just now"; }
+
+    return (timeCountTexted(timeDiff) + " ago");
+}
+
+function timeCountTexted(timeDiff) {
+    const days = Math.floor(timeDiff / 86400000);
+    const restDays = timeDiff % 86400000;
+    const hours = Math.floor(restDays / 3600000);
+    const restHours = restDays % 3600000;
+    const minutes = Math.floor(restHours / 60000);
+    const restMinutes = restHours % 60000;
+    const seconds = Math.floor(restMinutes / 1000);
+
+    const timeParts = [[days, 'day'], [hours, 'hour'], [minutes, 'minute'], [seconds, 'second']];
+
+    const timeLeft = timeParts
+        .filter(p => p[0] > 0)
+        .slice(0, 2)
+        .map(p => `${pluralize(p[0], p[1])}`)
+        .join(", ");
+
+    return (timeLeft || "less than a second");
 }
 
 document.addEventListener("DOMContentLoaded", loadTasks);
