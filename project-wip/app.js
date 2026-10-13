@@ -191,5 +191,34 @@ filterButtonsContainer.addEventListener("click", (e) => {
     }
 });
 
+function pluralize(count, word) {
+    return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+function formatTimeLeft(deadline){
+    const date = new Date(deadline);
+    const dateDiff = date - Date.now();
+
+    const days = Math.floor(date/86400000);
+    const restDays = date%86400000;
+    const hours = Math.floor(restDays/3600000);
+    const restHours = restDays%3600000;
+    const minutes = Math.floor(restHours/60000);
+    const restMinutes = restHours%60000;
+    const seconds = Math.floor(restMinutes/1000);
+
+    if (!deadline) { return "";}
+    else if(dateDiff <= 0) {
+        return "Deadline was not met.";
+    }
+    else {
+        if(days > 0){ return `${pluralize(days, "day")}, ${pluralize(hours, "hour")}`; }
+        else if (hours > 0){ return `${pluralize(hours, "hour")}, ${pluralize(minutes, "minute")}`; }
+        else if (minutes > 0){ return `${pluralize(minutes, "minute")}, ${pluralize(seconds, "second")}`; }
+        else { return `${pluralize(seconds, "second")}`; }
+    }
+
+
+}
 
 document.addEventListener("DOMContentLoaded", loadTasks);
