@@ -163,33 +163,43 @@ function renderTasks() {
         return;
     }
 
+/***********************************************
+REPLACE CHECKBOX WITH "Completed" BUTTON
+CHANGE CLASS STYLE FROM TASK-DEADLINE TO A NEW ONE
+REWORK CLASS STYLE .TASK-DEADLINE
+CHANGE CLASS STYLE FROM TASK-DEADLINE TO A NEW ONE
+MAYBE THINK ABOUT STYLING
+STYLIZE WITH A PIN/UNPIN BUTTON
+***********************************************/
     container.innerHTML = tasks.map(task => `
-        <div class="task-item ${task.is_completed ? "completed" : ""}">
+        <div class="task-item ${task.is_completed ? "completed" : ""}">     
             <input type="checkbox" class="complete-checkbox" data-id="${task.id}"
-                ${task.is_completed ? "checked" : ""}>
+                ${task.is_completed                                                                     
+                    ? "checked" 
+                    : ""}>
             <div class="task-info">
                 <h3 class="task-title">${escapeHTML(task.title)}</h3>
                 ${task.description
                     ? `<p class="task-desc">${escapeHTML(task.description)}</p>`
                     : ""}
                 ${task.date_created
-                    ? `<p class="task-deadline">Created ${addedTime(task.date_created)}</p>`            // CHANGE CLASS STYLE FROM TASK-DEADLINE TO A NEW ONE
+                    ? `<p class="task-deadline">Created ${addedTime(task.date_created)}</p>`
                     : ""}
                 ${task.deadline && !task.is_completed 
-                    ? `<p class="task-deadline">Due in ${deadlineTimeLeft(task.deadline)}</p>`          // REWORK CLASS STYLE .TASK-DEADLINE
+                    ? `<p class="task-deadline">Due in ${deadlineTimeLeft(task.deadline)}</p>`
                     : ""}
                 ${task.is_completed && task.date_completed
-                    ? `<p class="task-deadline">Completed in ${completionTime(task.date_created, task.date_completed)}</p>`          // CHANGE CLASS STYLE FROM TASK-DEADLINE TO A NEW ONE
+                    ? `<p class="task-deadline">Completed in ${completionTime(task.date_created, task.date_completed)}</p>`
                     : ""}
             </div>
-            <span class="priority-${task.priority}">${task.priority}</span>
-            ${task.is_completed 
+            <span class="priority-${task.priority}">${task.priority}</span>                             
+            ${task.is_completed
                 ? `<button class="return-btn" data-id="${task.id}"><span>Return</span></button>` : ""}
-            ${task.is_pinned 
+            ${task.is_pinned                                                                            
                 ? `<button class="unpin-btn" data-id="${task.id}"><span>Unpin</span></button>`
-                : `<button class="pin-btn" data-id="${task.id}"><span>Pin</span></button>`}
+                : `<button class="pin-btn" data-id="${task.id}"><span>Pin</span></button>`}             
             
-            <button class="delete-btn" data-id="${task.id}"><span>Delete</span></button>
+            <button class="delete-btn" data-id="${task.id}"><span>Delete</span></button>                
         </div>
     `).join("");
 }
