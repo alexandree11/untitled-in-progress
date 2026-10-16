@@ -157,11 +157,15 @@ function escapeHTML(str) {
 
 function renderTasks() {
     const tasks = getVisibleTasks();
+    
+    // taskCounter(tasks);
 
     if (tasks.length === 0) {
         container.innerHTML = `<p class="empty">No tasks found</p>`;
         return;
     }
+
+
 
 /***********************************************
 REPLACE CHECKBOX WITH "Completed" BUTTON
@@ -268,5 +272,10 @@ function timeCountTexted(timeDiff) {
 
     return (timeLeft || "less than a second");
 }
+
+/* function taskCounter(activeTasks) {
+    const taskCount = document.querySelector("#task-count");
+    taskCount.textContent = `Showing ${activeTasks} of ${pluralize(allTasks.length, "task")}`;
+} */
 
 document.addEventListener("DOMContentLoaded", loadTasks);
