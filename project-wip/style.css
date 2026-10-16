@@ -176,7 +176,17 @@ button {
     display: none;
 }
 
-.task-deadline {
+.task-deadline-time {
+    color: gray;
+    font-size: 10px;
+}
+
+.task-created-time {
+    color: gray;
+    font-size: 10px;
+}
+
+.task-completed-time {
     color: gray;
     font-size: 10px;
 }
