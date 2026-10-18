@@ -114,3 +114,6 @@ def toggle_pin_task(task_id: int):
     connect.commit()
     connect.close()
     return {"message": "Task pin status updated successfully"}
+
+""" @app.put("/api/tasks/{task_id}")
+def editTask(task: TaskCreate) """

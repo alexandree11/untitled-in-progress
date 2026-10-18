@@ -235,7 +235,7 @@ function renderTasks() {
                     ? `<p class="task-desc">${escapeHTML(task.description)}</p>`
                     : ""}
                 ${task.date_created
-                    ? `<p class="task-created-time" data-created="${task.date_created}">${addedTime(task.date_created)}</p>`
+                    ? `<p class="task-created-time" data-created="${task.date_created}">${createdTime(task.date_created)}</p>`
                     : ""}
                 ${task.deadline && !task.is_completed 
                     ? `<p class="task-deadline-time" data-deadline="${task.deadline}">${deadlineTimeLeft(task.deadline)}</p>`
@@ -303,9 +303,20 @@ function completionTime(dateCreated, dateCompleted) {
 }
 
 /* 
-    write the comments
+    this function displays the time when the task was created
+    takes dateCreated parameter which stores the information when the task was created
+    if the task doesnt have such information we return an empty string so nothing will
+        be returned and stop the execution of the function
+    firstly we change the format of the information using Date function and store it in creationDate
+        so we follow the ISO-format for the time
+    timeDiff calculates the difference between current time and the time the task was created
+    if time difference is less or equal than a minute(60000 milliseconds) we return a string
+        that says "Created less than a minute ago" and stop the function
+    otherwise we return "Created [formatted time converted to text using timeCountTexted] ago"
+        for example: "Created 3 hours, 11 minutes ago"
+
 */
-function addedTime(dateCreated) {
+function createdTime(dateCreated) {
     if(!dateCreated) { return ""; }
 
     const creationDate = new Date(dateCreated);
@@ -382,7 +393,7 @@ function updateTaskCounter(visibleTasksCount) {
 */
 function updateTimes(){
     document.querySelectorAll("[data-created], [data-deadline]").forEach(element => {
-        if(element.dataset.created) { element.textContent = addedTime(element.dataset.created); }
+        if(element.dataset.created) { element.textContent = createdTime(element.dataset.created); }
         else if(element.dataset.deadline) { element.textContent = deadlineTimeLeft(element.dataset.deadline); }
     });
 }
