@@ -3,12 +3,16 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Optional
 import sqlite3
+from fastapi import HTTPException
 
 class TaskCreate(BaseModel):
     title: str
     priority: str = 'medium'
     description: str = ''
     deadline: Optional[str] = None
+
+class TaskEdit(TaskCreate):
+    pass
 
 app = FastAPI()
 
@@ -115,5 +119,22 @@ def toggle_pin_task(task_id: int):
     connect.close()
     return {"message": "Task pin status updated successfully"}
 
-""" @app.put("/api/tasks/{task_id}")
-def editTask(task: TaskCreate) """
+@app.put("/api/tasks/{task_id}")
+def edit_task(task: TaskCreate, task_id: int):
+    connect = get_db_connection()
+    try:
+        cursor = connect.cursor()
+        cursor.execute("""
+        UPDATE tasks
+        SET title = ?, 
+            priority = ?, 
+            description = ?, 
+            deadline = ?
+        WHERE id=?
+        """, (task.title, task.priority, task.description, task.deadline, task_id))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+        connect.commit()
+    finally:
+        connect.close()
+    return {"message": "Task updated successfully"}
