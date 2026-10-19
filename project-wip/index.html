@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
@@ -8,7 +8,7 @@
 </head>
 
 <body>
-  <p id="task-counter">...</p> <!-- finish the line -->
+  <p id="task-counter">...</p>
   <div id="filter-buttons">
     <button class="filter-btn active" data-filter="all">All</button>
     <button class="filter-btn" data-filter="active">Active</button>
@@ -23,7 +23,7 @@
   <div id="modal-overlay" class="modal-overlay hidden">
     <div class="modal">
       <button id="close-modal-btn" class="modal-close">×</button>
-      <h2>New task</h2>
+      <h2 class="modal-title">New task</h2>
 
       <input type="text" id="task-title" placeholder="Task name">
       <input type="text" id="task-desc" placeholder="Description (optional)">
@@ -36,8 +36,8 @@
         Deadline
         <input type="datetime-local" id="task-deadline">
       </label>
-
-      <button id="add-btn">Add</button>
+      
+      <button id="add-task-btn">Add</button>
     </div>
   </div>
 

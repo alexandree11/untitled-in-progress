@@ -2,14 +2,15 @@
     write the comments
 */
 const container = document.querySelector("#user-container");
-const addTaskButton = document.querySelector("#add-btn");
-const taskInput = document.querySelector("#task-title");
+const addTaskButton = document.querySelector("#add-task-btn");
+const saveButton = document.querySelector("save-task-btn")
+const taskTitleInput = document.querySelector("#task-title");
 const descInput = document.querySelector("#task-desc");
 const priorityInput = document.querySelector("#task-priority");
 const searchInput = document.querySelector("#search-input");
 const filterButtonsContainer = document.querySelector("#filter-buttons");
-const openModalBtn = document.querySelector("#open-modal-btn");
-const closeModalBtn = document.querySelector("#close-modal-btn");
+const openModalButton = document.querySelector("#open-modal-btn");
+const closeModalButton = document.querySelector("#close-modal-btn");
 const modalOverlay = document.querySelector("#modal-overlay");
 const deadlineInput = document.querySelector("#task-deadline");
 const taskCounterText = document.querySelector("#task-counter");
@@ -25,6 +26,7 @@ const API = "http://127.0.0.1:8000/api/tasks";
 let allTasks = [];
 let currentFilter = "all";
 let searchQuery = "";
+let editingTaskId = null;
 
 /* 
     write the comments
@@ -34,14 +36,16 @@ container.addEventListener("click", (e) => {
     if (!target) return
     const taskId = target.dataset.id;
 
-    if (target.classList.contains("delete-btn")) {
+    if (target.classList.contains("delete-task-btn")) {
         deleteTask(taskId);
-    } else if ((target.classList.contains("complete-checkbox"))
-        || (target.classList.contains("return-btn"))) {
+    } else if ((target.classList.contains("complete-task-checkbox"))
+        || (target.classList.contains("return-task-btn"))) {
         toggleTaskComplete(taskId);
-    } else if ((target.classList.contains("pin-btn"))
-        || (target.classList.contains("unpin-btn"))) {
+    } else if ((target.classList.contains("pin-task-btn"))
+        || (target.classList.contains("unpin-task-btn"))) {
         toggleTaskPin(taskId);
+    } else if((target.classList.contains("edit-task-btn"))) {
+        editTaskModal(taskId);
     }
 });
 
@@ -50,7 +54,7 @@ container.addEventListener("click", (e) => {
 */
 function openModal() {
     modalOverlay.classList.remove("hidden");
-    taskInput.focus();
+    taskTitleInput.focus();
 }
 
 /* 
@@ -58,13 +62,22 @@ function openModal() {
 */
 function closeModal() {
     modalOverlay.classList.add("hidden");
+
+    editingTaskId = null;
+    taskTitleInput.value = "";
+    descInput.value = "";
+    priorityInput.value = "selected";
+    deadlineInput.value = "";
+    
+    saveButton.textContent = "Add";
+
 }
 
 /* 
     write the comments
 */
-openModalBtn.addEventListener("click", openModal);
-closeModalBtn.addEventListener("click", closeModal);
+openModalButton.addEventListener("click", openModal);
+closeModalButton.addEventListener("click", closeModal);
 
 /* 
     write the comments
@@ -84,7 +97,7 @@ document.addEventListener("keydown", (e) => {
     write the comments
 */
 addTaskButton.addEventListener("click", async () => {
-    const title = taskInput.value.trim();
+    const title = taskTitleInput.value.trim();
     const description = descInput.value.trim();
     const priority = priorityInput.value;
     const deadline = deadlineInput.value
@@ -105,7 +118,7 @@ addTaskButton.addEventListener("click", async () => {
             return;
         }
 
-        taskInput.value = "";
+        taskTitleInput.value = "";
         descInput.value = "";
         deadlineInput.value = "";
         closeModal();
@@ -225,7 +238,7 @@ function renderTasks() {
 */
     container.innerHTML = tasks.map(task => `
         <div class="task-item ${task.is_completed ? "completed" : ""}">     
-            <input type="checkbox" class="complete-checkbox" data-id="${task.id}"
+            <input type="checkbox" class="complete-task-checkbox" data-id="${task.id}"
                 ${task.is_completed                                                                     
                     ? "checked" 
                     : ""}>
@@ -246,12 +259,13 @@ function renderTasks() {
             </div>
             <span class="priority-${task.priority}">${task.priority}</span>                             
             ${task.is_completed
-                ? `<button class="return-btn" data-id="${task.id}"><span>Return</span></button>` : ""}
+                ? `<button class="return-task-btn" data-id="${task.id}"><span>Return</span></button>` : ""}
             ${task.is_pinned                                                                            
-                ? `<button class="unpin-btn" data-id="${task.id}"><span>Unpin</span></button>`
-                : `<button class="pin-btn" data-id="${task.id}"><span>Pin</span></button>`}             
-            
-            <button class="delete-btn" data-id="${task.id}"><span>Delete</span></button>                
+                ? `<button class="unpin-task-btn" data-id="${task.id}"><span>Unpin</span></button>`
+                : `<button class="pin-task-btn" data-id="${task.id}"><span>Pin</span></button>`}
+            ${!task.is_completed
+                ? `<button class="edit-task-btn" data-id="${task.id}"><span>Edit</span></button>` : ""}
+            <button class="delete-task-btn" data-id="${task.id}"><span>Delete</span></button>                
         </div>
     `).join("");
 }
@@ -397,6 +411,22 @@ function updateTimes(){
         else if(element.dataset.deadline) { element.textContent = deadlineTimeLeft(element.dataset.deadline); }
     });
 }
+
+/* 
+    write comments for open "edit task" modal window funtion
+ */
+function editTaskModal(taskId){
+    const task = allTasks.find(t => t.id === Number(taskId));
+    if (!task) return
+
+    openModal();
+    editingTaskId = task.id;
+    
+    taskTitleInput.value = task.title;
+    descInput.value = task.description;
+    priorityInput.value = task.priority;
+}
+
 
 /* 
     write the comments
