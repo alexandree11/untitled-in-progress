@@ -47,10 +47,6 @@ button {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.task-item.completed {
-    background-color: #a6ffb2;
-}
-
 .task-info {
     flex: 1;
     min-width: 0;
@@ -68,7 +64,7 @@ button {
     color: #666;
 }
 
-.complete-checkbox {
+.complete-task-checkbox {
     width: 20px;
     height: 20px;
     cursor: pointer;
@@ -77,22 +73,6 @@ button {
 .empty {
     text-align: center;
     color: #999;
-}
-
-.card h3 {
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    color: #333;
-}
-
-.card p {
-    margin: 0;
-    color: #666;
-    font-size: 14px;
-}
-
-.completed .task.task-item.completed{
-    text-decoration: line-through;
 }
 
 .card.completed {

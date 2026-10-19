@@ -3,7 +3,7 @@
 */
 const container = document.querySelector("#user-container");
 const addTaskButton = document.querySelector("#add-task-btn");
-const saveButton = document.querySelector("save-task-btn")
+const saveButton = document.querySelector("#save-task-btn")
 const taskTitleInput = document.querySelector("#task-title");
 const descInput = document.querySelector("#task-desc");
 const priorityInput = document.querySelector("#task-priority");
@@ -70,7 +70,7 @@ function closeModal() {
     deadlineInput.value = "";
     
     saveButton.textContent = "Add";
-
+    loadTasks();
 }
 
 /* 
@@ -135,7 +135,7 @@ async function deleteTask(taskId) {
     const confirmDelete = confirm("Do you want to delete this task?");
 
     if (confirmDelete) {
-        await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
+        await fetch(`${API}/${taskId}`, {
             method: "DELETE"
         });
         loadTasks();
@@ -146,7 +146,7 @@ async function deleteTask(taskId) {
     write the comments
 */
 async function toggleTaskComplete(taskId) {
-    await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}/complete`, {
+    await fetch(`${API}/${taskId}/complete`, {
         method: "PATCH"
     });
     loadTasks();
@@ -156,7 +156,7 @@ async function toggleTaskComplete(taskId) {
     write the comments
 */
 async function toggleTaskPin(taskId) {
-    await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}/pin`, {
+    await fetch(`${API}/${taskId}/pin`, {
         method: "PATCH"
     });
     loadTasks();
@@ -276,7 +276,7 @@ function renderTasks() {
 filterButtonsContainer.addEventListener("click", (e) => {
     if (e.target.classList.contains("filter-btn")) {
         currentFilter = e.target.dataset.filter;
-        loadTasks();
+        renderTasks();
     }
 });
 

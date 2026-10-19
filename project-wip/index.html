@@ -3,14 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>User Directory</title>
+  <title>To Do List</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   <p id="task-counter">...</p>
   <div id="filter-buttons">
-    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" selected data-filter="all">All</button>
     <button class="filter-btn" data-filter="active">Active</button>
     <button class="filter-btn" data-filter="completed">Completed</button>
   </div>
@@ -23,7 +23,7 @@
   <div id="modal-overlay" class="modal-overlay hidden">
     <div class="modal">
       <button id="close-modal-btn" class="modal-close">×</button>
-      <h2 class="modal-title">New task</h2>
+      <h2 id="modal-title">New task</h2>
 
       <input type="text" id="task-title" placeholder="Task name">
       <input type="text" id="task-desc" placeholder="Description (optional)">

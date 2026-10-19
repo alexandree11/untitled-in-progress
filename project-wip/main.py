@@ -1,9 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Literal
 import sqlite3
-from fastapi import HTTPException
 
 class TaskCreate(BaseModel):
     title: str
@@ -30,6 +29,7 @@ def init_db():
                 priority TEXT DEFAULT 'medium',
                 description TEXT DEFAULT '',
                 is_completed BOOLEAN DEFAULT 0)""")
+    connect.close()
 
 def check_add_column(column_name, column_definition):
     connect = get_db_connection()
@@ -120,7 +120,7 @@ def toggle_pin_task(task_id: int):
     return {"message": "Task pin status updated successfully"}
 
 @app.put("/api/tasks/{task_id}")
-def edit_task(task: TaskCreate, task_id: int):
+def edit_task(task: TaskEdit, task_id: int):
     connect = get_db_connection()
     try:
         cursor = connect.cursor()
