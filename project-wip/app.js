@@ -2,8 +2,7 @@
     write the comments
 */
 const container = document.querySelector("#user-container");
-const addTaskButton = document.querySelector("#add-task-btn");
-const saveButton = document.querySelector("#save-task-btn")
+const saveTaskButton = document.querySelector("#save-task-btn")
 const taskTitleInput = document.querySelector("#task-title");
 const descInput = document.querySelector("#task-desc");
 const priorityInput = document.querySelector("#task-priority");
@@ -12,6 +11,7 @@ const filterButtonsContainer = document.querySelector("#filter-buttons");
 const openModalButton = document.querySelector("#open-modal-btn");
 const closeModalButton = document.querySelector("#close-modal-btn");
 const modalOverlay = document.querySelector("#modal-overlay");
+const modalTitle = document.querySelector("#modal-title");
 const deadlineInput = document.querySelector("#task-deadline");
 const taskCounterText = document.querySelector("#task-counter");
 
@@ -46,7 +46,7 @@ container.addEventListener("click", (e) => {
         toggleTaskPin(taskId);
     } else if((target.classList.contains("edit-task-btn"))) {
         editTaskModal(taskId);
-    }
+    } 
 });
 
 /* 
@@ -66,10 +66,11 @@ function closeModal() {
     editingTaskId = null;
     taskTitleInput.value = "";
     descInput.value = "";
-    priorityInput.value = "selected";
+    priorityInput.value = "medium";
     deadlineInput.value = "";
     
-    saveButton.textContent = "Add";
+    saveTaskButton.textContent = "Add";
+    modalTitle.textContent = "New task";
     loadTasks();
 }
 
@@ -96,7 +97,7 @@ document.addEventListener("keydown", (e) => {
 /* 
     write the comments
 */
-addTaskButton.addEventListener("click", async () => {
+saveTaskButton.addEventListener("click", async () => {
     const title = taskTitleInput.value.trim();
     const description = descInput.value.trim();
     const priority = priorityInput.value;
@@ -105,10 +106,18 @@ addTaskButton.addEventListener("click", async () => {
         : null;
 
     if (!title) return;
+    
+    let method = "POST";
+    let url = API;
+
+    if (editingTaskId != null) {
+        method = "PUT";
+        url = `${API}/${editingTaskId}`;
+    }
 
     try {
-        const response = await fetch(API, {
-            method: "POST",
+        const response = await fetch(url, {
+            method: method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ title, description, priority, deadline })
         });
@@ -118,11 +127,7 @@ addTaskButton.addEventListener("click", async () => {
             return;
         }
 
-        taskTitleInput.value = "";
-        descInput.value = "";
-        deadlineInput.value = "";
         closeModal();
-        await loadTasks();
     } catch (error) {
         console.log("Error:", error);
     }
@@ -280,6 +285,11 @@ filterButtonsContainer.addEventListener("click", (e) => {
     }
 });
 
+searchInput.addEventListener("input", (e) => {
+    searchQuery = e.target.value;
+    renderTasks();
+});
+
 /* 
     write the comments
 */
@@ -418,15 +428,32 @@ function updateTimes(){
 function editTaskModal(taskId){
     const task = allTasks.find(t => t.id === Number(taskId));
     if (!task) return
+    saveTaskButton.textContent = "Save";
+    modalTitle.textContent = "Edit task";
 
-    openModal();
     editingTaskId = task.id;
     
     taskTitleInput.value = task.title;
     descInput.value = task.description;
     priorityInput.value = task.priority;
+    deadlineInput.value = isoToLocalFormat(task.deadline);
+    
+    openModal();
 }
 
+function isoToLocalFormat(deadline) {
+    if (!deadline) { return ""; }
+    const deadlineDate = new Date(deadline);
+    const deadlineYear = deadlineDate.getFullYear();
+    const deadlineMonth = String((deadlineDate.getMonth() + 1)).padStart(2,"0");
+    const deadlineDay = String(deadlineDate.getDate()).padStart(2,"0");
+    const deadlineHours = String(deadlineDate.getHours()).padStart(2,"0");
+    const deadlineMinutes = String(deadlineDate.getMinutes()).padStart(2,"0");
+    
+    const formattedDate = deadlineYear + "-" + deadlineMonth + "-" + deadlineDay + "T" + deadlineHours + ":" + deadlineMinutes;
+
+    return formattedDate;
+}
 
 /* 
     write the comments
