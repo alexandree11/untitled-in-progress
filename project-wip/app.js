@@ -64,13 +64,12 @@ function closeModal() {
     modalOverlay.classList.add("hidden");
 
     editingTaskId = null;
+
     taskTitleInput.value = "";
     descInput.value = "";
     priorityInput.value = "medium";
     deadlineInput.value = "";
     
-    saveTaskButton.textContent = "Add";
-    modalTitle.textContent = "New task";
     loadTasks();
 }
 
@@ -114,6 +113,9 @@ saveTaskButton.addEventListener("click", async () => {
         method = "PUT";
         url = `${API}/${editingTaskId}`;
     }
+    
+    saveTaskButton.textContent = "Add";
+    modalTitle.textContent = "New task";
 
     try {
         const response = await fetch(url, {
