@@ -62,6 +62,9 @@ function openModal() {
 */
 function closeModal() {
     modalOverlay.classList.add("hidden");
+    
+    saveTaskButton.textContent = "Add";
+    modalTitle.textContent = "New task";
 
     editingTaskId = null;
 
@@ -113,9 +116,6 @@ saveTaskButton.addEventListener("click", async () => {
         method = "PUT";
         url = `${API}/${editingTaskId}`;
     }
-    
-    saveTaskButton.textContent = "Add";
-    modalTitle.textContent = "New task";
 
     try {
         const response = await fetch(url, {
