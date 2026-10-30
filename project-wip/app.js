@@ -29,7 +29,7 @@ const API = "http://127.0.0.1:8000/api/tasks";
     write the comments
 */
 let allTasks = [];
-let currentFilter = "all";
+let currentFilter = "active";
 let searchQuery = "";
 let editingTaskId = null;
 const selectedIds = new Set();
@@ -54,10 +54,6 @@ container.addEventListener("click", (e) => {
     } 
 });
 
-completeTaskButton.addEventListener("click", (e) => {
-    
-});
-
 function toggleTaskSelect(taskId){
     const id = Number(taskId);
     if(selectedIds.has(id)){
@@ -67,9 +63,27 @@ function toggleTaskSelect(taskId){
     updateActionBar();
 }
 
+function getSelectedTasks(){
+    return allTasks.filter(t => selectedIds.has(t.id));
+}
+
 function updateActionBar(){
     actionBar.classList.toggle("hidden", selectedIds.size < 1);
-    actionBarTaskCounter.textContent = `${selectedIds.size} selected.`;
+    actionBarTaskCounter.textContent = `${selectedIds.size} selected`;
+
+    const selectedTasks = getSelectedTasks();
+    const hasActive = selectedTasks.some(t => !t.is_completed);
+    const hasCompleted = selectedTasks.some(t => t.is_completed);
+
+    completeTaskButton.classList.toggle("hidden", !hasActive);
+    returnTaskButton.classList.toggle("hidden", !hasCompleted);
+}
+
+async function toggleCompleteForTasks(items) {
+    for (const item of items) {
+            await fetch(`${API}/${item.id}/complete`, 
+                { method: "PATCH" });
+            }
 }
 
 /* 
@@ -175,6 +189,13 @@ async function deleteTask(taskId) {
 /* 
     write the comments
 */
+completeTaskButton.addEventListener("click", async() => {
+    // filter selected that are not completed yet
+    // send request for those selected
+    // clear selected
+    // load tasks
+});
+
 async function toggleTaskComplete(taskId) {
     await fetch(`${API}/${taskId}/complete`, {
         method: "PATCH"

@@ -152,10 +152,6 @@ button {
     background: transparent;
 }
 
-.hidden {
-    display: none;
-}
-
 .task-deadline-time {
     color: gray;
     font-size: 10px;
@@ -169,6 +165,10 @@ button {
 .task-completed-time {
     color: gray;
     font-size: 10px;
+}
+
+.hidden {
+    display: none;
 }
 
 /* .task-deadline-missed {} */
