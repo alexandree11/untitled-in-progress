@@ -14,6 +14,11 @@ const modalOverlay = document.querySelector("#modal-overlay");
 const modalTitle = document.querySelector("#modal-title");
 const deadlineInput = document.querySelector("#task-deadline");
 const taskCounterText = document.querySelector("#task-counter");
+const actionBar = document.querySelector("#action-bar");
+const completeTaskButton = document.querySelector("#complete-task-btn");
+const returnTaskButton = document.querySelector("#return-task-btn");
+const deleteTaskButton = document.querySelector("#delete-task-btn");
+const actionBarTaskCounter = document.querySelector("#action-bar-count");
 
 /* 
     write the comments
@@ -27,6 +32,7 @@ let allTasks = [];
 let currentFilter = "all";
 let searchQuery = "";
 let editingTaskId = null;
+const selectedIds = new Set();
 
 /* 
     write the comments
@@ -38,9 +44,8 @@ container.addEventListener("click", (e) => {
 
     if (target.classList.contains("delete-task-btn")) {
         deleteTask(taskId);
-    } else if ((target.classList.contains("complete-task-checkbox"))
-        || (target.classList.contains("return-task-btn"))) {
-        toggleTaskComplete(taskId);
+    } else if (target.classList.contains("select-task-checkbox")) {
+        toggleTaskSelect(taskId);
     } else if ((target.classList.contains("pin-task-btn"))
         || (target.classList.contains("unpin-task-btn"))) {
         toggleTaskPin(taskId);
@@ -48,6 +53,24 @@ container.addEventListener("click", (e) => {
         editTaskModal(taskId);
     } 
 });
+
+completeTaskButton.addEventListener("click", (e) => {
+    
+});
+
+function toggleTaskSelect(taskId){
+    const id = Number(taskId);
+    if(selectedIds.has(id)){
+        selectedIds.delete(id);
+    } else { selectedIds.add(id); }
+
+    updateActionBar();
+}
+
+function updateActionBar(){
+    actionBar.classList.toggle("hidden", selectedIds.size < 1);
+    actionBarTaskCounter.textContent = `${selectedIds.size} selected.`;
+}
 
 /* 
     write the comments
@@ -227,6 +250,7 @@ function renderTasks() {
     const tasks = getVisibleTasks();
     
     updateTaskCounter(tasks.length);
+    updateActionBar();
 
     if (tasks.length === 0) {
         container.innerHTML = `<p class="empty">No tasks found</p>`;
@@ -245,8 +269,8 @@ function renderTasks() {
 */
     container.innerHTML = tasks.map(task => `
         <div class="task-item ${task.is_completed ? "completed" : ""}">     
-            <input type="checkbox" class="complete-task-checkbox" data-id="${task.id}"
-                ${task.is_completed                                                                     
+            <input type="checkbox" class="select-task-checkbox" data-id="${task.id}"
+                ${selectedIds.has(task.id)                                                                     
                     ? "checked" 
                     : ""}>
             <div class="task-info">
@@ -265,13 +289,11 @@ function renderTasks() {
                     : ""}
             </div>
             <span class="priority-${task.priority}">${task.priority}</span>                             
-            ${task.is_completed
-                ? `<button class="return-task-btn" data-id="${task.id}"><span>Return</span></button>` : ""}
+            ${!task.is_completed
+                ? `<button class="edit-task-btn" data-id="${task.id}"><span>Edit</span></button>` : ""}
             ${task.is_pinned                                                                            
                 ? `<button class="unpin-task-btn" data-id="${task.id}"><span>Unpin</span></button>`
                 : `<button class="pin-task-btn" data-id="${task.id}"><span>Pin</span></button>`}
-            ${!task.is_completed
-                ? `<button class="edit-task-btn" data-id="${task.id}"><span>Edit</span></button>` : ""}
             <button class="delete-task-btn" data-id="${task.id}"><span>Delete</span></button>                
         </div>
     `).join("");
