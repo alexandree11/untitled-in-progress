@@ -167,8 +167,34 @@ button {
     font-size: 10px;
 }
 
+.action-bar {
+  /* Фиксируем относительно окна браузера */
+  position: fixed;
+  top: 16px; /* Отступ от верхнего края экрана */
+  left: 50%; /* Выравнивание по центру */
+  transform: translateX(-50%); /* Центрирование панели */
+
+  /* Делаем панель поверх остальных элементов страницы */
+  z-index: 1000;
+
+  /* Оформление (подгони под свой дизайн) */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+
+  /* Плавное исчезновение/появление при переключении класса hidden */
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* Класс для скрытия экшен-бара */
 .hidden {
-    display: none;
+  display: none;
 }
 
 /* .task-deadline-missed {} */

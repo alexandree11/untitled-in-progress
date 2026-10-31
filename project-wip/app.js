@@ -81,9 +81,9 @@ function updateActionBar(){
 
 async function toggleCompleteForTasks(items) {
     for (const item of items) {
-            await fetch(`${API}/${item.id}/complete`, 
-                { method: "PATCH" });
-            }
+        await fetch(`${API}/${item.id}/complete`, 
+            { method: "PATCH" });
+    }
 }
 
 /* 
@@ -189,12 +189,17 @@ async function deleteTask(taskId) {
 /* 
     write the comments
 */
-completeTaskButton.addEventListener("click", async() => {
-    // filter selected that are not completed yet
-    // send request for those selected
-    // clear selected
-    // load tasks
-});
+async function toggleAsCompleted(fromActive){
+    const selected = getSelectedTasks().filter(t => 
+        Boolean(!t.is_completed) === fromActive
+    );
+    await toggleCompleteForTasks(selected);
+    for (const task of selected) { selectedIds.delete(task.id); }
+    await loadTasks();
+}
+
+completeTaskButton.addEventListener("click", () => toggleAsCompleted(true));
+returnTaskButton.addEventListener("click", () => toggleAsCompleted(false));
 
 async function toggleTaskComplete(taskId) {
     await fetch(`${API}/${taskId}/complete`, {
