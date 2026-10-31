@@ -18,6 +18,7 @@ const actionBar = document.querySelector("#action-bar");
 const completeTaskButton = document.querySelector("#complete-task-btn");
 const returnTaskButton = document.querySelector("#return-task-btn");
 const deleteTaskButton = document.querySelector("#delete-task-btn");
+const clearSelectedTasksButton = document.querySelector("#clear-selected");
 const actionBarTaskCounter = document.querySelector("#action-bar-count");
 
 /* 
@@ -209,6 +210,13 @@ async function toggleAsCompleted(fromActive){
 
 completeTaskButton.addEventListener("click", () => toggleAsCompleted(true));
 returnTaskButton.addEventListener("click", () => toggleAsCompleted(false));
+clearSelectedTasksButton.addEventListener("click", () => clearSelectedTasks());
+
+function clearSelectedTasks(){
+    selectedIds.clear();
+    loadTasks();
+}
+
 
 /* 
     write the comments
