@@ -79,6 +79,15 @@ function updateActionBar(){
     returnTaskButton.classList.toggle("hidden", !hasCompleted);
 }
 
+// PROBABLY DONT NEED THIS FUNCTION ANYMORE SINCE WE
+// DONT COMPLETE TASK SEPARATELY ONE BY ONE
+async function toggleTaskComplete(taskId) {
+    await fetch(`${API}/${taskId}/complete`, {
+        method: "PATCH"
+    });
+    loadTasks();
+}
+
 async function toggleCompleteForTasks(items) {
     for (const item of items) {
         await fetch(`${API}/${item.id}/complete`, 
@@ -200,13 +209,6 @@ async function toggleAsCompleted(fromActive){
 
 completeTaskButton.addEventListener("click", () => toggleAsCompleted(true));
 returnTaskButton.addEventListener("click", () => toggleAsCompleted(false));
-
-async function toggleTaskComplete(taskId) {
-    await fetch(`${API}/${taskId}/complete`, {
-        method: "PATCH"
-    });
-    loadTasks();
-}
 
 /* 
     write the comments
