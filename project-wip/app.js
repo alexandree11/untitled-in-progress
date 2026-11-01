@@ -43,9 +43,7 @@ container.addEventListener("click", (e) => {
     if (!target) return
     const taskId = target.dataset.id;
 
-    if (target.classList.contains("delete-task-btn")) {
-        deleteTask(taskId);
-    } else if (target.classList.contains("select-task-checkbox")) {
+    if (target.classList.contains("select-task-checkbox")) {
         toggleTaskSelect(taskId);
     } else if ((target.classList.contains("pin-task-btn"))
         || (target.classList.contains("unpin-task-btn"))) {
@@ -80,21 +78,29 @@ function updateActionBar(){
     returnTaskButton.classList.toggle("hidden", !hasCompleted);
 }
 
-// PROBABLY DONT NEED THIS FUNCTION ANYMORE SINCE WE
-// DONT COMPLETE TASK SEPARATELY ONE BY ONE
-async function toggleTaskComplete(taskId) {
-    await fetch(`${API}/${taskId}/complete`, {
-        method: "PATCH"
-    });
-    loadTasks();
-}
-
 async function toggleCompleteForTasks(items) {
     for (const item of items) {
         await fetch(`${API}/${item.id}/complete`, 
             { method: "PATCH" });
     }
 }
+
+async function deleteTasks(items) {
+    for (const item of items) {
+        await fetch(`${API}/${item.id}`, 
+            { method: "DELETE" });
+    }
+}
+
+deleteTaskButton.addEventListener("click", async () => {
+    const selectedTasks = getSelectedTasks();
+    if (selectedTasks.length < 1) { return; }
+    const confirmDelete = confirm(`Do you want to delete ${pluralize(selectedTasks.length,"task")}?`);
+    if(!confirmDelete) { return; }
+    await deleteTasks(selectedTasks);
+    selectedIds.clear();
+    await loadTasks();
+});
 
 /* 
     write the comments
@@ -185,20 +191,6 @@ saveTaskButton.addEventListener("click", async () => {
 /* 
     write the comments
 */
-async function deleteTask(taskId) {
-    const confirmDelete = confirm("Do you want to delete this task?");
-
-    if (confirmDelete) {
-        await fetch(`${API}/${taskId}`, {
-            method: "DELETE"
-        });
-        loadTasks();
-    }
-}
-
-/* 
-    write the comments
-*/
 async function toggleAsCompleted(fromActive){
     const selected = getSelectedTasks().filter(t => 
         Boolean(!t.is_completed) === fromActive
@@ -285,6 +277,7 @@ function escapeHTML(str) {
 function renderTasks() {
     const tasks = getVisibleTasks();
     
+    dropGhostedSelection(tasks);
     updateTaskCounter(tasks.length);
     updateActionBar();
 
@@ -292,8 +285,6 @@ function renderTasks() {
         container.innerHTML = `<p class="empty">No tasks found</p>`;
         return;
     }
-
-
 
 /*
     REPLACE CHECKBOX WITH "Completed" BUTTON
@@ -329,8 +320,7 @@ function renderTasks() {
                 ? `<button class="edit-task-btn" data-id="${task.id}"><span>Edit</span></button>` : ""}
             ${task.is_pinned                                                                            
                 ? `<button class="unpin-task-btn" data-id="${task.id}"><span>Unpin</span></button>`
-                : `<button class="pin-task-btn" data-id="${task.id}"><span>Pin</span></button>`}
-            <button class="delete-task-btn" data-id="${task.id}"><span>Delete</span></button>                
+                : `<button class="pin-task-btn" data-id="${task.id}"><span>Pin</span></button>`}    
         </div>
     `).join("");
 }
@@ -349,6 +339,13 @@ searchInput.addEventListener("input", (e) => {
     searchQuery = e.target.value;
     renderTasks();
 });
+
+function dropGhostedSelection(items) {
+    const visibleTasksId = new Set(items.map(item => item.id));
+    for(const taskId of selectedIds){
+        if (!visibleTasksId.has(taskId)){ selectedIds.delete(taskId); }
+    }
+}
 
 /* 
     write the comments

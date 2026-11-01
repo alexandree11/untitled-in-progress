@@ -64,9 +64,9 @@ button {
     color: #666;
 }
 
-.complete-task-checkbox {
-    width: 20px;
-    height: 20px;
+.select-task-checkbox {
+    width: 16px;
+    height: 16px;
     cursor: pointer;
 }
 
