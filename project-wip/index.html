@@ -27,11 +27,14 @@
 
       <input type="text" id="task-title" placeholder="Task name">
       <input type="text" id="task-desc" placeholder="Description (optional)">
-      <select id="task-priority">
-        <option value="low">Low</option>
-        <option value="medium" selected>Medium</option>
-        <option value="high">High</option>
-      </select>
+      <div id="priority-buttons">
+        <p>Priority:</p>
+        <div class="priority-btn-group">
+          <button data-priority="low" class="priority-btn">Low</button>
+          <button data-priority="medium" class="priority-btn selected">Medium</button>
+          <button data-priority="high" class="priority-btn">High</button>
+        </div>
+      </div>
       <label>
         Deadline
         <input type="datetime-local" id="task-deadline">

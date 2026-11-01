@@ -5,9 +5,9 @@ const container = document.querySelector("#user-container");
 const saveTaskButton = document.querySelector("#save-task-btn")
 const taskTitleInput = document.querySelector("#task-title");
 const descInput = document.querySelector("#task-desc");
-const priorityInput = document.querySelector("#task-priority");
 const searchInput = document.querySelector("#search-input");
 const filterButtonsContainer = document.querySelector("#filter-buttons");
+const priorityButtonsContainer = document.querySelector("#priority-buttons");
 const openModalButton = document.querySelector("#open-modal-btn");
 const closeModalButton = document.querySelector("#close-modal-btn");
 const modalOverlay = document.querySelector("#modal-overlay");
@@ -31,6 +31,7 @@ const API = "http://127.0.0.1:8000/api/tasks";
 */
 let allTasks = [];
 let currentFilter = "active";
+let currentPriority = "medium";
 let searchQuery = "";
 let editingTaskId = null;
 const selectedIds = new Set();
@@ -123,9 +124,9 @@ function closeModal() {
 
     taskTitleInput.value = "";
     descInput.value = "";
-    priorityInput.value = "medium";
+    setPriority("medium");
     deadlineInput.value = "";
-    
+
     loadTasks();
 }
 
@@ -155,7 +156,7 @@ document.addEventListener("keydown", (e) => {
 saveTaskButton.addEventListener("click", async () => {
     const title = taskTitleInput.value.trim();
     const description = descInput.value.trim();
-    const priority = priorityInput.value;
+    const priority = currentPriority;
     const deadline = deadlineInput.value
         ? new Date(deadlineInput.value).toISOString()
         : null;
@@ -335,6 +336,20 @@ filterButtonsContainer.addEventListener("click", (e) => {
     }
 });
 
+priorityButtonsContainer.addEventListener("click", (e) => {
+    if(e.target.classList.contains("priority-btn")) {
+        setPriority(e.target.dataset.priority);
+    }
+});
+
+function setPriority(value) {
+    currentPriority = value;
+    document.querySelectorAll(".priority-btn").forEach(b => 
+        b.classList.toggle("selected", b.dataset.priority === value)
+
+    );
+}
+
 searchInput.addEventListener("input", (e) => {
     searchQuery = e.target.value;
     renderTasks();
@@ -492,7 +507,7 @@ function editTaskModal(taskId){
     
     taskTitleInput.value = task.title;
     descInput.value = task.description;
-    priorityInput.value = task.priority;
+    setPriority(task.priority);
     deadlineInput.value = isoToLocalFormat(task.deadline);
     
     openModal();

@@ -184,6 +184,73 @@ button {
   border-radius: 8px;
 }
 
+/* 1. Контейнер: превращаем строку с кнопками в гибкий блок */
+#priority-buttons p {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Отступ между надписью Priority: и блоком кнопок */
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* 2. Обёртка или логическое объединение самих кнопок */
+/* Чтобы кнопки слиплись, дадим им общий класс или сгруппируем */
+.priority-btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  color: #475569;
+  background-color: #f1f5f9;
+  
+  /* Убираем рамки и зазоры */
+  border: 1px solid #cbd5e1;
+  border-right: none; /* Убираем двойные границы между соседними кнопками */
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Применяем скругления ТОЛЬКО к первой и последней кнопке */
+.priority-btn:first-of-type {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.priority-btn:last-of-type {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  border-right: 1px solid #cbd5e1; /* Возвращаем внешнюю правую границу */
+}
+
+/* Ховер на неактивную кнопку */
+.priority-btn:hover:not(.selected) {
+  background-color: #e2e8f0;
+}
+
+/* 3. Состояние выбранной кнопки (.selected) */
+.priority-btn.selected {
+  background-color: #2563eb; /* Яркий цвет выделения */
+  color: #ffffff;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+
+/* Чтобы граница выбранной кнопки красиво перекрывала соседнюю */
+.priority-btn.selected + .priority-btn {
+  border-left-color: #2563eb;
+}
+
+#priority-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.priority-btn-group {
+  display: inline-flex; /* Склеивает кнопки внутри в один монолитный блок */
+}
+
 .hidden {
   display: none;
 }
