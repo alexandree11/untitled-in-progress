@@ -127,7 +127,8 @@ function closeModal() {
     setPriority("medium");
     deadlineInput.value = "";
 
-    loadTasks();
+    // loadTasks(); check if i need to loadTasks when closing modal window
+
 }
 
 /* 
@@ -346,7 +347,6 @@ function setPriority(value) {
     currentPriority = value;
     document.querySelectorAll(".priority-btn").forEach(b => 
         b.classList.toggle("selected", b.dataset.priority === value)
-
     );
 }
 
