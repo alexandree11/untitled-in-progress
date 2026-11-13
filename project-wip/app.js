@@ -114,7 +114,7 @@ async function toggleAsCompleted(fromActive){
 
 deleteTaskButton.addEventListener("click", async () => {
     if(isBusy) return;
-    const confirmDelete = confirm(`Do you want to delete ${pluralize(selectedTasks.length,"task")}?`);
+    const confirmDelete = confirm(`Do you want to delete ${pluralize(getSelectedTasks.length+1,"task")}?`);
     if(!confirmDelete) return;
     isBusy = true;
     try {
