@@ -2,7 +2,7 @@
     write the comments
 */
 const container = document.querySelector("#user-container");
-const saveTaskButton = document.querySelector("#save-task-btn")
+const saveTaskButton = document.querySelector("#save-task-btn");
 const taskTitleInput = document.querySelector("#task-title");
 const descInput = document.querySelector("#task-desc");
 const searchInput = document.querySelector("#search-input");
@@ -34,6 +34,7 @@ let currentFilter = "active";
 let currentPriority = "medium";
 let searchQuery = "";
 let editingTaskId = null;
+let isBusy = false;
 const selectedIds = new Set();
 
 /* 
@@ -41,7 +42,7 @@ const selectedIds = new Set();
 */
 container.addEventListener("click", (e) => {
     const target = e.target.closest("[data-id]");
-    if (!target) return
+    if (!target) return;
     const taskId = target.dataset.id;
 
     if (target.classList.contains("select-task-checkbox")) {
@@ -93,14 +94,38 @@ async function deleteTasks(items) {
     }
 }
 
+/* 
+    write the comments
+*/
+async function toggleAsCompleted(fromActive){
+    if(isBusy) return;
+    const selected = getSelectedTasks().filter(t => 
+        Boolean(!t.is_completed) === fromActive
+    );
+    isBusy = true;
+    try {
+        await toggleCompleteForTasks(selected);
+        for (const task of selected) { selectedIds.delete(task.id); }
+    } finally {
+        await loadTasks();
+        isBusy = false;
+    }
+}
+
 deleteTaskButton.addEventListener("click", async () => {
-    const selectedTasks = getSelectedTasks();
-    if (selectedTasks.length < 1) { return; }
+    if(isBusy) return;
     const confirmDelete = confirm(`Do you want to delete ${pluralize(selectedTasks.length,"task")}?`);
-    if(!confirmDelete) { return; }
-    await deleteTasks(selectedTasks);
-    selectedIds.clear();
-    await loadTasks();
+    if(!confirmDelete) return;
+    isBusy = true;
+    try {
+        const selectedTasks = getSelectedTasks();
+        if (selectedTasks.length < 1) { return; }
+        await deleteTasks(selectedTasks);
+        // selectedIds.clear();
+    } finally {
+        await loadTasks();
+        isBusy = false;
+    }
 });
 
 /* 
@@ -127,8 +152,7 @@ function closeModal() {
     setPriority("medium");
     deadlineInput.value = "";
 
-    // loadTasks(); check if i need to loadTasks when closing modal window
-
+    loadTasks();
 }
 
 /* 
@@ -189,18 +213,6 @@ saveTaskButton.addEventListener("click", async () => {
         console.log("Error:", error);
     }
 });
-
-/* 
-    write the comments
-*/
-async function toggleAsCompleted(fromActive){
-    const selected = getSelectedTasks().filter(t => 
-        Boolean(!t.is_completed) === fromActive
-    );
-    await toggleCompleteForTasks(selected);
-    for (const task of selected) { selectedIds.delete(task.id); }
-    await loadTasks();
-}
 
 completeTaskButton.addEventListener("click", () => toggleAsCompleted(true));
 returnTaskButton.addEventListener("click", () => toggleAsCompleted(false));
@@ -499,7 +511,7 @@ function updateTimes(){
  */
 function editTaskModal(taskId){
     const task = allTasks.find(t => t.id === Number(taskId));
-    if (!task) return
+    if (!task) return;
     saveTaskButton.textContent = "Save";
     modalTitle.textContent = "Edit task";
 
