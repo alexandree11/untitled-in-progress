@@ -42,7 +42,8 @@ const PRIORITY_RANK = {low:1, medium:2, high:3};
 const COMPARATORS = {
     created: (a,b) => (a.date_created || "").localeCompare(b.date_created || ""),
     title: (a,b) => a.title.localeCompare(b.title),
-    priority: (a,b) => (PRIORITY_RANK[a.priority] || 0) - (PRIORITY_RANK[b.priority] || 0)
+    priority: (a,b) => (PRIORITY_RANK[a.priority] || 0) - (PRIORITY_RANK[b.priority] || 0),
+    deadline: (a,b) => new Date(a.deadline) - new Date(b.deadline)
 };
 
 /* 
@@ -262,7 +263,6 @@ function getVisibleTasks() {
     const q = searchQuery.trim().toLowerCase();
     const [key, direction] = currentSort.split("-");
     const sign = direction === "asc" ? 1 : -1;
-
     const compare = COMPARATORS[key];
 
     return allTasks
@@ -286,6 +286,17 @@ function getVisibleTasks() {
             }
             if (a.is_pinned) {
                 return ((b.pinned_at || "").localeCompare((a.pinned_at || "")));
+            }
+            if (key === "deadline") {
+                if (!a.deadline && !b.deadline) {
+                    return 0;
+                }
+                if (!a.deadline) {
+                    return 1;
+                }
+                if (!b.deadline) {
+                    return -1;
+                }
             }
             if (!compare) return 0;
             return compare(a,b)*sign;
