@@ -20,6 +20,7 @@ const returnTaskButton = document.querySelector("#return-task-btn");
 const deleteTaskButton = document.querySelector("#delete-task-btn");
 const clearSelectedTasksButton = document.querySelector("#clear-selected");
 const actionBarTaskCounter = document.querySelector("#action-bar-count");
+const sortingMenu = document.querySelector("#sort-by-menu");
 
 /* 
     write the comments
@@ -35,7 +36,14 @@ let currentPriority = "medium";
 let searchQuery = "";
 let editingTaskId = null;
 let isBusy = false;
+let currentSort = sortingMenu.value;
 const selectedIds = new Set();
+const PRIORITY_RANK = {low:1, medium:2, high:3};
+const COMPARATORS = {
+    created: (a,b) => (a.date_created || "").localeCompare(b.date_created || ""),
+    title: (a,b) => a.title.localeCompare(b.title),
+    priority: (a,b) => (PRIORITY_RANK[a.priority] || 0) - (PRIORITY_RANK[b.priority] || 0)
+};
 
 /* 
     write the comments
@@ -252,6 +260,10 @@ async function loadTasks() {
 */
 function getVisibleTasks() {
     const q = searchQuery.trim().toLowerCase();
+    const [key, direction] = currentSort.split("-");
+    const sign = direction === "asc" ? 1 : -1;
+
+    const compare = COMPARATORS[key];
 
     return allTasks
         .filter(task => {
@@ -269,10 +281,14 @@ function getVisibleTasks() {
         })
 
         .sort((a, b) => {
-            if (b.is_pinned !== a.is_pinned) {
+            if (a.is_pinned !== b.is_pinned) {
                 return b.is_pinned - a.is_pinned;
             }
-            return ((b.pinned_at || "").localeCompare((a.pinned_at || "")));
+            if (a.is_pinned) {
+                return ((b.pinned_at || "").localeCompare((a.pinned_at || "")));
+            }
+            if (!compare) return 0;
+            return compare(a,b)*sign;
         });
 }
 
@@ -353,6 +369,11 @@ priorityButtonsContainer.addEventListener("click", (e) => {
     if(e.target.classList.contains("priority-btn")) {
         setPriority(e.target.dataset.priority);
     }
+});
+
+sortingMenu.addEventListener("change", () => {
+    currentSort = sortingMenu.value;
+    renderTasks();
 });
 
 function setPriority(value) {

@@ -16,6 +16,16 @@
   </div>
 
   <h1>Tasks list</h1>
+  <select id="sort-by-menu">
+    <option value="created-asc" selected>Date created (Oldest first)</option>
+    <option value="created-desc">Date created (Newest first)</option>
+    <option value="title-asc">Name (A-Z)</option>
+    <option value="title-desc">Name (Z-A)</option>
+    <option value="priority-asc">Priority (Lowest first)</option>
+    <option value="priority-desc">Priority (Highest first)</option>
+    <option value="deadline-asc">Deadline (Closest first)</option>
+    <option value="deadline-desc">Deadline (Latest first)</option>
+  </select>
   <button id="open-modal-btn">New task</button>
 
   <input type="search" id="search-input" placeholder="Search tasks...">
